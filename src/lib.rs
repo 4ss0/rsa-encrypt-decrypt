@@ -12,8 +12,6 @@ pub mod key_gen{
     
 
     pub fn initialize_key_pair() -> (String, String) {
-    
-        
 
         let rsa = Rsa::generate(1024).unwrap();
         let private_key: Vec<u8> = rsa.private_key_to_pem().unwrap();
@@ -33,11 +31,12 @@ pub mod key_gen{
 
     pub fn decrypt_with_rsa_private_key(pvt_key: String, base64text: String) -> Result<String, ErrorStack> {
         let rsa = Rsa::private_key_from_pem(pvt_key.as_bytes())?;
-        let plaintext = base64::decode(&base64text).unwrap();
+        let plaintext = base64::decode(&base64text).expect("NOT AN AN ENCRYPTED STRING !");
         let mut ciphertext = vec![0; rsa.size() as usize];
         let len = rsa.private_decrypt(&plaintext, &mut ciphertext, Padding::PKCS1)?;
         ciphertext.truncate(len);
-        Ok(base64::encode(&ciphertext))
+        let result = String::from_utf8_lossy(&ciphertext).to_string();
+        Ok(result)
     }
 
 }
